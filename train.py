@@ -2,6 +2,7 @@ import tensorflow as tf
 from tqdm import tqdm
 import numpy as np
 from utils import load_obj
+import os.path
 
 
 class Train:
@@ -55,20 +56,23 @@ class Train:
 
     def __load_imagenet_weights(self):
         variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-        try:
-            print("Loading ImageNet pretrained weights...")
-            dict = load_obj(self.args.pretrained_path)
-            run_list = []
-            for variable in variables:
-                for key, value in dict.items():
-                    # Adding ':' means that we are interested in the variable itself and not the variable parameters
-                    # that are used in adaptive optimizers
-                    if key + ":" in variable.name:
-                        run_list.append(tf.assign(variable, value))
-            self.sess.run(run_list)
-            print("Weights loaded\n\n")
-        except KeyboardInterrupt:
-            print("No pretrained ImageNet weights exist. Skipping...\n\n")
+        if os.path.exists(self.args.pretrained_path):
+            try:
+                print("Loading ImageNet pretrained weights...")
+                dict = load_obj(self.args.pretrained_path)
+                run_list = []
+                for variable in variables:
+                    for key, value in dict.items():
+                        # Adding ':' means that we are interested in the variable itself and not the variable parameters
+                        # that are used in adaptive optimizers
+                        if key + ":" in variable.name:
+                            run_list.append(tf.assign(variable, value))
+                self.sess.run(run_list)
+                print("Weights loaded\n\n")
+            except KeyboardInterrupt:
+                print("No pretrained ImageNet weights exist. Skipping...\n\n")
+        else:
+            print("Not load imagenet_pretrain_weights: No weights file, Continue...")
 
     ############################################################################################################
     # Train and Test methods
