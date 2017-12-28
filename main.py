@@ -21,6 +21,7 @@ def main():
     tf.reset_default_graph()
 
     # Tensorflow specific configuration
+    
     config = tf.ConfigProto(allow_soft_placement=True)
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
